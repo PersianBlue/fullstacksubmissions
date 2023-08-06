@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const url = process.env.MONGODB_URI;
+//REMEMBER TO SET THIS IN ENV PARAMETERS IN RENDER
 mongoose.set("strictQuery", false);
 mongoose
   .connect(url)
