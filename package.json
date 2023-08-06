@@ -4,7 +4,7 @@
   "description": "submissions for fullstackopen part4",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose",
     "start": "node ./src/index.js",
     "build:ui": "shx rm -rf build && cd ../phonebook_frontend && npm run build && shx cp -r build ../phonebook_backend",
     "deploy:full": "shx npm run build:ui && git add . && git commit -m uibuild && git push",
@@ -28,7 +28,11 @@
     "url": "https://github.com/PersianBlue/FullStackOpenExercises/issues"
   },
   "homepage": "https://github.com/PersianBlue/FullStackOpenExercises#readme",
+  "jest": {
+    "testEnvironment": "node"
+  },
   "devDependencies": {
-    "eslint": "^8.46.0"
+    "eslint": "^8.46.0",
+    "jest": "^29.6.2"
   }
 }
