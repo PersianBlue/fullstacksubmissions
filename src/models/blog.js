@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { MONGODB_URI } = require("../utils/config");
 
 const blogSchema = new mongoose.Schema({
   title: String,
@@ -9,8 +10,16 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model("Blog", blogSchema);
 
-const mongoUrl = process.env.MONGODB_URI;
+const mongoUrl = MONGODB_URI;
 
 mongoose.connect(mongoUrl);
+
+blogSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
 
 module.exports = Blog;
