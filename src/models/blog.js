@@ -1,18 +1,17 @@
 const mongoose = require("mongoose");
-const { MONGODB_URI } = require("../utils/config");
 
 const blogSchema = new mongoose.Schema({
   title: String,
   author: String,
   url: String,
   likes: Number,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 
 const Blog = mongoose.model("Blog", blogSchema);
-
-const mongoUrl = MONGODB_URI;
-
-mongoose.connect(mongoUrl);
 
 blogSchema.set("toJSON", {
   transform: (document, returnedObject) => {
