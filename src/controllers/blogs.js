@@ -2,6 +2,7 @@ const BlogsRouter = require("express").Router();
 const Blog = require("../models/blog.js");
 const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
+const { userExtractor } = require("../utils/middleware.js");
 
 const getTokenFrom = (request) => {
   const authorization = request.get("authorization");
@@ -33,7 +34,7 @@ BlogsRouter.get("/:id", async (request, response) => {
   response.json(blog).status(200);
 });
 
-BlogsRouter.post("/", async (request, response) => {
+BlogsRouter.post("/", userExtractor, async (request, response) => {
   if (!request.body.url || !request.body.title) {
     response.status(400).json({ error: "Bad request. Missing title or url" });
   }
@@ -42,6 +43,7 @@ BlogsRouter.post("/", async (request, response) => {
     : { ...request.body, likes: 0 };
 
   const user = request.user;
+  // console.log(user);
   blogObject.user = user.id;
 
   const blog = new Blog(blogObject);
@@ -53,21 +55,17 @@ BlogsRouter.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-BlogsRouter.delete("/:id", async (request, response) => {
+BlogsRouter.delete("/:id", userExtractor, async (request, response) => {
   const user = request.user;
 
   const blog = await Blog.findById(request.params.id);
   if (!(blog.user.toString() === user.id)) {
-    console.log(blog.user.toString());
-    console.log(user.id);
-    console.log("User ID did not match ID on blog");
     return response
-      .status(400)
+      .status(401)
       .json({ error: "User not authorized to delete this blog." });
   }
-  blog.deleteOne();
+  await blog.deleteOne();
 
-  // await Blog.findByIdAndRemove(request.params.id);
   response.status(204).end();
 });
 

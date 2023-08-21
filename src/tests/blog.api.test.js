@@ -13,33 +13,47 @@ const mongoose = require("mongoose");
 const app = require("../app");
 const api = supertest(app);
 const Blog = require("../models/blog.js");
-
+const User = require("../models/user");
+let token = "";
 const apiUrl = "/api/blogs";
+const userUrl = "/api/users";
 beforeAll(async () => {
   await Blog.deleteMany({});
+  await User.deleteMany({});
   const blogObjects = initialBlogs.map((blog) => new Blog(blog));
   const promiseArray = blogObjects.map((blog) => blog.save());
   await Promise.all(promiseArray);
-}, 12000);
+  const loginInfo = {
+    username: "admin",
+    password: "password",
+    name: "administrator",
+  };
+  await api.post("/api/users").send(loginInfo);
+  const response = await api.post("/api/login").send(loginInfo);
+  token = response.body.token;
+}, 15000);
 
 describe("Testing api get requests", () => {
   //
   test("blogs are returned as json", async () => {
     await api
       .get(apiUrl)
+      // .set("Authorization", `Bearer ${token}`)
       .expect(200)
       .expect("Content-Type", /application\/json/);
   });
 
   test("all blogs are returned", async () => {
     const response = await api.get(apiUrl);
+    // .set("Authorization", `Bearer ${token}`);
 
     expect(response.body).toHaveLength(initialBlogs.length);
   });
 
   test("the first blog has the id property", async () => {
-    const response = await api.get(apiUrl);
-    console.log(response.body);
+    const response = await api
+      .get(apiUrl)
+      .set("Authorization", `Bearer ${token}`);
     const IDs = response.body.map((blog) => blog.id);
     IDs.forEach((id) => {
       expect(id).toBeDefined();
@@ -52,6 +66,7 @@ describe("Testing api post requests", () => {
     await api
       .post(apiUrl)
       .send(testBlog)
+      .set("Authorization", `Bearer ${token}`)
       .expect(201)
       .expect("Content-Type", /application\/json/);
 
@@ -66,30 +81,60 @@ describe("Testing api post requests", () => {
     const { likes, ...rest } = testBlog;
     const newObject = rest;
 
-    const response = await api.post(apiUrl).send(newObject);
+    const response = await api
+      .post(apiUrl)
+      .send(newObject)
+      .set("Authorization", `Bearer ${token}`);
     expect(response.body.likes).toBe(0);
   });
 
   test("missing title or url returns 400 (bad request)", async () => {
     const { url, ...noUrl } = testBlog;
     const { title, ...noTitle } = testBlog;
-    await api.post(apiUrl).send(noUrl).expect(400);
-    await api.post(apiUrl).send(noTitle).expect(400);
+    await api
+      .post(apiUrl)
+      .send(noUrl)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(400);
+    await api
+      .post(apiUrl)
+      .send(noTitle)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(400);
+  });
+
+  test("No token returns 401 unauthorized", async () => {
+    await api.post(apiUrl).send(testBlog).expect(401);
   });
 });
 
 describe("Testing api delete requests", () => {
-  test("deleting a note works successfully", async () => {
+  test("deleting a blog works successfully", async () => {
     const blogsAtStart = await blogsInDb();
-    const sampleBlog = blogsAtStart[0];
-    await api.delete(`${apiUrl}/${sampleBlog.id}`).expect(204);
+    const blogObject = {
+      title: "This blog is used for testing",
+      author: "Michael",
+      url: "google.com",
+      likes: 0,
+    };
+    const postResponse = await api
+      .post(apiUrl)
+      .send(blogObject)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(201);
+
+    const sampleBlog = postResponse.body;
+    const response = await api
+      .delete(`${apiUrl}/${sampleBlog.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .expect(204);
 
     const blogsAtEnd = await blogsInDb();
-    expect(blogsAtEnd.length).toBe(blogsAtStart.length - 1);
+    expect(blogsAtEnd.length).toBe(blogsAtStart.length);
 
     const titles = blogsAtEnd.map((blog) => blog.title);
     expect(titles).not.toContain(sampleBlog.title);
-  });
+  }, 10000);
 });
 
 describe("Testing api put requests", () => {
@@ -101,6 +146,7 @@ describe("Testing api put requests", () => {
     const response = await api
       .put(`${apiUrl}/${initialBlog.id}`)
       .send(modifiedBlog)
+      .set("Authorization", `Bearer ${token}`)
       .expect(200);
     const updatedBlog = response.body;
     expect(updatedBlog.likes).toBe(25);
