@@ -52,6 +52,8 @@ BlogsRouter.post("/", userExtractor, async (request, response) => {
   user.blogs = user.blogs.concat(savedBlog._id);
   await user.save();
   //don't change this from _id. there are some async issues with mongoose transforms
+  savedBlog.user = user;
+  console.log(savedBlog);
   response.status(201).json(savedBlog);
 });
 
@@ -69,12 +71,17 @@ BlogsRouter.delete("/:id", userExtractor, async (request, response) => {
   response.status(204).end();
 });
 
-BlogsRouter.put("/:id", async (request, response) => {
+BlogsRouter.put("/:id", userExtractor, async (request, response) => {
   const blog = { ...request.body };
+  // console.log("Blog user: ", blog.user);
+  const user = request.user;
+  console.log("user: ", user);
 
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
     new: true,
   });
+
+  updatedBlog.user = user;
   response.status(200).json(updatedBlog);
 });
 
