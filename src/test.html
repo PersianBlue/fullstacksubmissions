@@ -1,0 +1,234 @@
+<html lang="en">
+  <head>
+    <script type="text/javascript">
+      document.domain = "localhost";
+      (() => {
+        "use strict";
+        const e = (window.Cypress = parent.Cypress);
+        if (!e)
+          throw new Error(
+            "Something went terribly wrong and we cannot proceed. We expected to find the global Cypress in the parent window but it is missing. This should never happen and likely is a bug. Please open an issue."
+          );
+        const t = (() => {
+          let e, t, n, r;
+          const i = () => {
+              (e = !1), (t = !1), (n = []), (r = {});
+            },
+            o = (e, t = []) =>
+              "function" == typeof e ? e.apply(window, t) : window.eval(e);
+          return (
+            i(),
+            {
+              wrap: () => {
+                const i = {
+                    setTimeout: window.setTimeout,
+                    setInterval: window.setInterval,
+                    requestAnimationFrame: window.requestAnimationFrame,
+                    clearTimeout: window.clearTimeout,
+                    clearInterval: window.clearInterval,
+                  },
+                  a = (e, t) => i[e].apply(window, t),
+                  s = (e) => (n) => (t && (r[n] = !0), a(e, [n])),
+                  w =
+                    (t) =>
+                    (...r) => {
+                      let i,
+                        [s, w, ...p] = r;
+                      return (
+                        (i = a(t, [
+                          (...r) => {
+                            if (!e) return o(s, r);
+                            n.push({
+                              timerId: i,
+                              fnOrCode: s,
+                              params: r,
+                              type: t,
+                            });
+                          },
+                          w,
+                          ...p,
+                        ])),
+                        i
+                      );
+                    };
+                (window.setTimeout = w("setTimeout")),
+                  (window.setInterval = w("setInterval")),
+                  (window.requestAnimationFrame = w("requestAnimationFrame")),
+                  (window.clearTimeout = s("clearTimeout")),
+                  (window.clearInterval = s("clearInterval"));
+              },
+              reset: i,
+              pause: (a) => {
+                (e = Boolean(a)),
+                  e ||
+                    ((t = !0),
+                    n.forEach((e) => {
+                      const { timerId: t, type: n, fnOrCode: i, params: a } = e;
+                      ("setInterval" === n && r[t]) || o(i, a);
+                    }),
+                    i());
+              },
+            }
+          );
+        })();
+        e.removeAllListeners("app:timers:reset"),
+          e.removeAllListeners("app:timers:pause"),
+          e.on("app:timers:reset", t.reset),
+          e.on("app:timers:pause", t.pause),
+          t.wrap(),
+          e.action("app:window:before:load", window);
+      })();
+    </script>
+    <script type="module">
+      import RefreshRuntime from "/@react-refresh";
+      RefreshRuntime.injectIntoGlobalHook(window);
+      window.$RefreshReg$ = () => {};
+      window.$RefreshSig$ = () => (type) => type;
+      window.__vite_plugin_react_preamble_installed__ = true;
+    </script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+    <style
+      type="text/css"
+      data-vite-dev-id="C:/Users/krist/Work/fullstackopen/fullstacksubmissions/bloglist-frontend/src/components/notification.css"
+    >
+      .error {
+        color: red;
+        background: lightgrey;
+        font-size: 20px;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+
+      .alert {
+        color: green;
+        background: lightgrey;
+        font-size: 20px;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div>
+        <h2>Blogs</h2>
+        <div class="alert">You liked Amazing Grace by Mark Zuckerberg</div>
+        <p>Matti Luukkainen logged in</p>
+        <div class="blog-list">
+          <div
+            class="blog"
+            style="
+              padding-top: 10px;
+              padding-left: 2px;
+              border: 1px solid;
+              margin-bottom: 5px;
+            "
+          >
+            Battle Hymn by Mark Zuckerberg <button>view</button>
+          </div>
+          <div
+            class="blog"
+            style="
+              padding-top: 10px;
+              padding-left: 2px;
+              border: 1px solid;
+              margin-bottom: 5px;
+            "
+          >
+            Glory Road by Mark Zuckerberg <button>hide</button>
+            <div>
+              <p>Likes: 0</p>
+              <button>Like blog</button>
+              <p>
+                Url:
+                <a href="amazon.com" target="_blank" rel="nooopener noreferrer"
+                  >amazon.com</a
+                >
+              </p>
+              <p>User: Matti Luukkainen</p>
+              <button>Remove blog</button>
+            </div>
+          </div>
+          <div
+            class="blog"
+            style="
+              padding-top: 10px;
+              padding-left: 2px;
+              border: 1px solid;
+              margin-bottom: 5px;
+            "
+          >
+            Amazing Grace by Mark Zuckerberg <button>hide</button>
+            <div>
+              <p>Likes: 2</p>
+              <button>Like blog</button>
+              <p>
+                Url:
+                <a href="amazon.com" target="_blank" rel="nooopener noreferrer"
+                  >amazon.com</a
+                >
+              </p>
+              <p>User: Matti Luukkainen</p>
+              <button>Remove blog</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div>
+            <div><button>Create a blog</button></div>
+            <div style="display: none">
+              <div>
+                <form>
+                  <div>
+                    Title
+                    <input
+                      class="titleField"
+                      type="text"
+                      name="Title"
+                      placeholder="Title"
+                      value=""
+                    />
+                  </div>
+                  <div>
+                    Author
+                    <input
+                      class="authorField"
+                      type="text"
+                      name="Author"
+                      placeholder="Author"
+                      value=""
+                    />
+                  </div>
+                  <div>
+                    Url
+                    <input
+                      type="text"
+                      class="urlField"
+                      name="Url"
+                      placeholder="Url"
+                      value=""
+                    />
+                  </div>
+                  <button type="submit">Create blog</button>
+                </form>
+              </div>
+              <button>cancel</button>
+            </div>
+          </div>
+        </div>
+        <button>Logout</button>
+      </div>
+    </div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
