@@ -7,7 +7,7 @@
     "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
     "start": "cross-env NODE_ENV=production node ./src/index.js",
     "dev": "cross-env NODE_ENV=development nodemon ./src/index.js",
-    "build:ui": "shx rm -rf build && cd ../bloglist-frontend && npm run build && shx cp -r build ../bloglist",
+    "build:ui": "shx rm -rf dist && cd ../bloglist-frontend && npm run build && shx cp -r dist ../bloglist",
     "deploy:full": "shx npm run build:ui && git add . && git commit -m uibuild && git push",
     "lint": "eslint .",
     "start:test": "cross-env NODE_ENV=test nodemon ./src/index.js"
